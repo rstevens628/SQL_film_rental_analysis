@@ -1,0 +1,16 @@
+-- Use a CTE to calculate the average amount paid within the top 10 cities.
+
+WITH avg_paid_cte (customer_id, first_name, last_name, city, country, sum_amount) AS
+	(SELECT A. customer_id,B. first_name,B. last_name,D. city,E. country,
+	SUM(amount) AS amount_paid
+	FROM payment A
+	INNER JOIN customer B ON A. customer_id = B. customer_id
+	INNER JOIN address C ON B. address_id = C. address_id
+	INNER JOIN city D ON C. city_id = D. city_id
+	INNER JOIN country E ON D. country_id = E. country_id
+	WHERE D. city IN ('Aurora','Atlixco','Xintai','Adoni','Dhule (Dhulia)','Kurashiki','Pingxiang','Sivas','Celaya','So Leopoldo')
+	GROUP BY A. customer_id, B. first_name, B. last_name, D. city, E. country
+	ORDER BY amount_paid DESC
+	LIMIT 5)
+SELECT AVG (sum_amount) AS avg_paid
+FROM avg_paid_cte
